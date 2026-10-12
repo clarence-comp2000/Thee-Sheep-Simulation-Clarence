@@ -1,5 +1,6 @@
 # Thee Sheep Simulation
 ## Overview
+comp2000 assignment essentially
 
 ## Simulation Concept
 The original proposal involves:
