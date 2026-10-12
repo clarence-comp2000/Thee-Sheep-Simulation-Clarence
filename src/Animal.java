@@ -288,7 +288,9 @@ public abstract class Animal extends Entity{
                 wait--;
             }
     }
-    protected void ChasingMate()
+
+    /*
+        protected void ChasingMate()
     {
         if(hunger < hungerToReproduce)
         {
@@ -314,7 +316,40 @@ public abstract class Animal extends Entity{
             System.out.println(this + "Target Entity not found");
         }
     }
+    */
 
+    protected void ChasingMate()
+    {
+        if(hunger < hungerToReproduce)
+        {
+            state = AnimalState.lookingForFood;
+            targetEntity = null;
+            return;
+        }
+
+        if (targetEntity == null || !targetEntity.IsAlive())
+        {
+            targetEntity = null;
+            state = AnimalState.lookingForMate;
+            return;
+        }
+
+        Animal mate = (Animal) targetEntity;
+
+        if(mate.GetHunger() < hungerToReproduce)
+        {
+            targetEntity = null;
+            state = AnimalState.lookingForFood;
+            return;
+        }
+
+        if(Move(mate.pos, 10))
+        {
+            Reproduce(mate);
+            state = AnimalState.lookingForFood;
+            mate.state = AnimalState.lookingForFood;
+        }
+    }
 
     protected void Reproduce(Animal anim)
     {
