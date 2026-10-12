@@ -7,7 +7,7 @@ public abstract class Animal extends Entity{
 
     protected enum AnimalState
     {
-        lookingForFood, 
+        lookingForFood,
         chasingFood,
         lookingForMate,
         chasingMate;
@@ -50,12 +50,12 @@ public abstract class Animal extends Entity{
     }
 
 
-    
+
 
 
     public Animal()
     {
-        
+
     }
 
     public Animal(String name, double speed, double perception, int lifeSpan, Animal[] parents)
@@ -66,7 +66,7 @@ public abstract class Animal extends Entity{
         }else{
             this.name = nameList[(int)(Math.random() * nameList.length)];
         }
-        
+
         this.speed = speed;
         this.perception = perception;
         this.lifeSpan = lifeSpan;
@@ -107,7 +107,7 @@ public abstract class Animal extends Entity{
             KillEntity();
             return;
         }
-        
+
         switch(state){
             case AnimalState.lookingForFood:
             {
@@ -128,7 +128,7 @@ public abstract class Animal extends Entity{
                 break;
             }
 
-        }     
+        }
     }
 
     protected void LookingForFood()
@@ -142,9 +142,9 @@ public abstract class Animal extends Entity{
             }else
             {
                 RoamRandomly();
-            
+
             }
-        
+
         }else{
             targetEntity = null;
             RoamRandomly();
@@ -179,11 +179,12 @@ public abstract class Animal extends Entity{
         targetEntity = ent;
         state = AnimalState.chasingMate;
     }
-    
-    protected void LookingForMate()
+
+    /*
+        protected void LookingForMate()
     {
         Entity closest = null;
-        double closestDist = 99999;        
+        double closestDist = 99999;
         for (Entity ent: Board.entities.get(entityType.get()) )
         {
             if(ent == null || ent == this)
@@ -195,7 +196,7 @@ public abstract class Animal extends Entity{
                 {
                     //other creature is not ready to mate
                     a.AttractMate(this);
-                    
+
                 }else{
                     continue;
                 }
@@ -209,7 +210,7 @@ public abstract class Animal extends Entity{
         }
 
 
-            
+
 
         if(closest != null)
         {
@@ -223,14 +224,63 @@ public abstract class Animal extends Entity{
         {
             RoamRandomly();
         }
-        
+
+    }
+        */
+
+    protected void LookingForMate()
+    {
+        if(hunger < hungerToReproduce)
+        {
+            targetEntity = null;
+            state = AnimalState.lookingForFood;
+            return;
+        }
+
+        Animal closest = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for(Entity ent : Board.entities.get(entityType.get()))
+        {
+            if(!(ent instanceof Animal) || ent == this || !ent.IsAlive())
+            {
+                continue;
+            }
+            Animal potentialMate = (Animal) ent;
+
+            if(potentialMate.GetState() != AnimalState.lookingForMate
+                || potentialMate.GetHunger() < hungerToReproduce)
+            {
+                continue;
+            }
+
+            double dist = pos.dist(potentialMate.pos);
+
+            if(dist < perception && dist < closestDist)
+            {
+                closest = potentialMate;
+                closestDist = dist;
+            }
+        }
+
+        if(closest != null)
+        {
+            targetEntity = closest;
+            state = AnimalState.chasingMate;
+
+            closest.AttractMate(this);
+        }
+        else
+        {
+            RoamRandomly();
+        }
     }
 
     protected void RoamRandomly()
     {
         boolean moved = Move(randPos, 10);
             if (moved && (wait == 0 || hunger < 0.25))
-            {   
+            {
                 wait = 100;
                 randPos = Position.genRand(Board.bWidth, Board.bHeight, 0, 100, 40);
             }
@@ -265,18 +315,18 @@ public abstract class Animal extends Entity{
         }
     }
 
-    
+
     protected void Reproduce(Animal anim)
     {
         targetEntity = null;
-        
+
         hunger = hunger - 0.4f;
         anim.hunger = anim.hunger - 0.4f;
         anim.targetEntity = null;
 
         //temp
-        
-        
+
+
     }
     public Entity LookForFood()
     {
@@ -284,12 +334,12 @@ public abstract class Animal extends Entity{
         return null;
     }
 
-    
+
     public void EatFood(Entity entity)
     {
-       
+
         hunger += entity.nutrition;
-        
+
         if(hunger > 1.0)
         {
             hunger = 1.0;
@@ -301,10 +351,10 @@ public abstract class Animal extends Entity{
     }
 
 
-    
-    public void Reproduce() 
+
+    public void Reproduce()
     {
-        
+
     }
 
     @Override
@@ -312,7 +362,7 @@ public abstract class Animal extends Entity{
         g.setColor(colour);
         g.fillRect(pos.getX(), pos.getY(), 40,40);
 
-        
+
 
 
         g.setColor(Color.RED);
