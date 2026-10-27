@@ -24,7 +24,7 @@ public abstract class Plant extends Entity {
     @Override
     public void drawEntity(Graphics g) {
         g.setColor(pColour);
-        g.fillOval(pos.getX(), pos.getY(), 40,40);
+        g.fillOval(pos.getX() - 20, pos.getY() - 20, 40,40);
     }
 
 }

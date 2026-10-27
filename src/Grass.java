@@ -9,8 +9,8 @@ public class Grass extends Plant{
     }
 
     public Plant spreadGrass() {
-        int x = pos.getX() / 40;
-        int y = (pos.getY() - 100) / 40;
+        int x = (pos.getX() - 20) / 40;
+        int y = (pos.getY() - 120) / 40;
         int randX = (int)(Math.random() * 3) - 1;
         int randY = (int)(Math.random() * 3) - 1;
         int newX = 0;
@@ -25,12 +25,12 @@ public class Grass extends Plant{
         int rand = (int)(Math.random() * 5);
         if (rand == 1) {
             Flower newF = new Flower();
-            newF.pos = new Position(newX * 40, newY * 40 + 100);
+            newF.pos = new Position(newX * 40 + 20, newY * 40 + 120);
             Board.plantGrid[newY][newX] = newF;
             return newF;
         }
         Grass newG = new Grass();
-        newG.pos = new Position(newX * 40, newY * 40 + 100);
+        newG.pos = new Position(newX * 40 + 20, newY * 40 + 120);
         Board.plantGrid[newY][newX] = newG;
         return newG;
     }

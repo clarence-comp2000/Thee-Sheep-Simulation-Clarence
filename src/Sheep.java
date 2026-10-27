@@ -1,92 +1,64 @@
-import java.util.ArrayList;
-import java.util.List;
-public class Sheep extends Animal{
 
-    Flower targetFlower = null;
+import java.awt.*;
+import java.util.Comparator;
 
-    public Sheep(String name, float speed, float perception, int lifeSpan, Animal[] parents)
+public class Sheep extends Animal {
+
+    public Sheep(Genes genes, Animal[] parents, int age)
     {
-        super(name, speed, perception, lifeSpan, parents);
+        super(genes, parents, age);
         nutrition = 0.5;
         entityType = Board.Ent.sheep;
+
+        sprintOnFlee = true;
     }
-
-    /*
-    public Entity LookForFood()
-    {
-        //tempo just to allow for logic development. Replace with proper entity database at some point
-        // Do flowers first, then grass
-        List<Entity> allPlants = Board.entities.get(Board.Ent.flower.get());
-
-
-        Entity closest = null;
-        double closestDist = 99999;
-        for (Entity flower : allPlants) {
-
-            double dist = this.pos.dist(flower.pos) ;
-            if(dist < this.perception && dist < closestDist)
-            {
-                closest = flower;
-                closestDist = dist;
-            }
-        }
-        if(closest != null)
-        {
-            //System.out.println("Closest flower @ " + closest.pos);
-            return closest;
-        }else{
-            //System.out.println("No flowers in range");
-
-        }
-        allPlants = Board.entities.get(Board.Ent.grass.get());
-        closestDist = 99999;
-        for (Entity grass : allPlants) {
-
-            double dist = this.pos.dist(grass.pos) ;
-            if(dist < this.perception && dist < closestDist)
-            {
-                closest = grass;
-                closestDist = dist;
-            }
-        }
-
-        return closest;
-        */
 
     @Override
     public Entity LookForFood()
     {
-        // search for nearest flower in perception range
+        // Search for the closest living flower within perception range.
         Entity closestFlower = Board.entities.get(Board.Ent.flower.get())
             .stream()
-            .filter(flower -> this.pos.dist(flower.pos) < this.perception)
-            .min((flower1, flower2) ->
-                Double.compare(
-                    this.pos.dist(flower1.pos),
-                    this.pos.dist(flower2.pos)))
+            .filter(Entity::IsAlive)
+            .filter(flower ->
+                this.pos.dist(flower.pos) < genes.GetPerception())
+            .min(Comparator.comparingDouble(
+                flower -> this.pos.dist(flower.pos)))
             .orElse(null);
 
-        // flowers chosen over grass
-        if(closestFlower != null) {
+        // Flowers are preferred over grass.
+        if (closestFlower != null)
+        {
             return closestFlower;
         }
 
-        // if flower not available, search for nearest grass
+        // If no flower is nearby, search for grass instead.
         return Board.entities.get(Board.Ent.grass.get())
             .stream()
-            .filter(grass -> this.pos.dist(grass.pos) < this.perception)
-            .min((grass1, grass2) ->
-                Double.compare(
-                    this.pos.dist(grass1.pos),
-                    this.pos.dist(grass2.pos)))
+            .filter(Entity::IsAlive)
+            .filter(grass ->
+                this.pos.dist(grass.pos) < genes.GetPerception())
+            .min(Comparator.comparingDouble(
+                grass -> this.pos.dist(grass.pos)))
             .orElse(null);
     }
 
     @Override
     protected void Reproduce(Animal partAnimal)
     {
-        super.Reproduce(partAnimal);
-       Board.babyAnimals.add(new Sheep(null, 1, 60, 5, new Animal[]{this, partAnimal}));
+        System.out.println("Making baby sheep");
 
+        Genes babyGenes = new Genes(genes, partAnimal.GetGenes());
+
+        Sheep newSheep = new Sheep(
+            babyGenes,
+            new Animal[]{this, partAnimal},
+            0
+        );
+
+        Board.babyAnimals.add(newSheep);
+
+        super.Reproduce(partAnimal);
     }
 }
+
