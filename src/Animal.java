@@ -182,42 +182,9 @@ public abstract class Animal extends Entity{
     int wait = 0;
     public void AnimalBehaviour()
     {
-        if(reproduceTimer >= 0)
-        {
-            reproduceTimer--;
-        }
         if(!IsAlive()) return;
-        hunger -= genes.GetHungerRate();
-
-        age += 1;
-        if(state != AnimalState.fleeing && stamina < genes.GetMaxStamina())
-        {
-            stamina += genes.GetStaminaRecoverRate();
-            //hunger -= 0.5 * genes.GetHungerRate();
-        }
-        
-
-        if(stamina >= genes.GetMaxStamina())
-        {
-            exhausted = false;
-            stamina = genes.GetMaxStamina();
-        }
-        if(hunger < 0)
-        {
-            System.out.println(name + " Starved");
-            hunger = 0;
-            KillEntity();
-            return;
-        }else if(age > genes.GetLifespan())
-        {
-            double roll = Math.random();
-            if(roll < 0.001)
-            {
-                System.out.println(name + " Died of old age" + age);
-                KillEntity();
-            }
-            
-        }
+        UpdateStats();
+       
         
         switch(state){
             case AnimalState.lookingForFood:
@@ -252,6 +219,46 @@ public abstract class Animal extends Entity{
             }
 
         }     
+    }
+
+    protected void UpdateStats()
+    {
+         if(reproduceTimer >= 0)
+        {
+            reproduceTimer--;
+        }
+        
+        hunger -= genes.GetHungerRate();
+
+        age += 1;
+        if(state != AnimalState.fleeing && stamina < genes.GetMaxStamina())
+        {
+            stamina += genes.GetStaminaRecoverRate();
+            //hunger -= 0.5 * genes.GetHungerRate();
+        }
+        
+
+        if(stamina >= genes.GetMaxStamina())
+        {
+            exhausted = false;
+            stamina = genes.GetMaxStamina();
+        }
+        if(hunger < 0)
+        {
+            System.out.println(name + " Starved");
+            hunger = 0;
+            KillEntity();
+            return;
+        }else if(age > genes.GetLifespan())
+        {
+            double roll = Math.random();
+            if(roll < 0.005)
+            {
+                System.out.println(name + " Died of old age" + age);
+                KillEntity();
+            }
+            
+        }
     }
 
     protected void Rest()
