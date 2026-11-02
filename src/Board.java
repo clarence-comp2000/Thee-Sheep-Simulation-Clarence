@@ -268,19 +268,19 @@ public class Board extends JPanel implements ActionListener {
             System.out.println(stat);
             int xPos = stat.tic / 100;
             g.setColor(Color.white);
-            int yPos = bHeight - stat.numSheep;
+            int yPos = getHeight() - stat.numSheep;
             g.fillOval(xPos, yPos, 5, 5);
 
             g.setColor(Color.gray);
-            yPos = bHeight - stat.numWolves;
+            yPos = getHeight() - stat.numWolves;
             g.fillOval(xPos, yPos, 5, 5);
 
             g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
-            yPos = bHeight - stat.numFlowers;
+            yPos = getHeight() - stat.numFlowers;
             g.fillOval(xPos, yPos, 5, 5);
 
             g.setColor(Color.green);
-            yPos = bHeight - stat.numGrass;
+            yPos = getHeight() - stat.numGrass;
             g.fillOval(xPos, yPos, 5, 5);
         }
     }
