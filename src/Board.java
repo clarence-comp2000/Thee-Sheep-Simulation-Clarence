@@ -67,6 +67,8 @@ public class Board extends JPanel implements ActionListener {
 
         showStats = false;
         stats = new ArrayList<>();
+        addNewStat();
+
 
         tic = 1;
         timePassed = 0;
@@ -266,7 +268,7 @@ public class Board extends JPanel implements ActionListener {
     private void drawStats(Graphics g) {
         for (Stat stat : stats) {
             System.out.println(stat);
-            int xPos = stat.tic / 100;
+            int xPos = scaleXPos(stat.tic / 100);
             g.setColor(Color.white);
             int yPos = getHeight() - stat.numSheep;
             g.fillOval(xPos, yPos, 5, 5);
@@ -283,6 +285,11 @@ public class Board extends JPanel implements ActionListener {
             yPos = getHeight() - stat.numGrass;
             g.fillOval(xPos, yPos, 5, 5);
         }
+    }
+
+    private int scaleXPos(int xPos) {
+        int ratio = getWidth() / stats.size();
+        return xPos * ratio;
     }
 
     private int nextSpawn = 50;
@@ -304,11 +311,7 @@ public class Board extends JPanel implements ActionListener {
             debugHover();
 
             if (tic % 100 == 0) {
-                int numSheep = entities.get(Ent.sheep.get()).size();
-                int numWolves = entities.get(Ent.wolf.get()).size();
-                int numGrass = entities.get(Ent.grass.get()).size();
-                int numFlowers = entities.get(Ent.flower.get()).size();
-                stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
+                addNewStat();
             }
 
             tic++;
@@ -321,6 +324,14 @@ public class Board extends JPanel implements ActionListener {
 
         CreateChildren();
         CleanUp(); 
+    }
+
+    private void addNewStat() {
+        int numSheep = entities.get(Ent.sheep.get()).size();
+        int numWolves = entities.get(Ent.wolf.get()).size();
+        int numGrass = entities.get(Ent.grass.get()).size();
+        int numFlowers = entities.get(Ent.flower.get()).size();
+        stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
     }
 
 
