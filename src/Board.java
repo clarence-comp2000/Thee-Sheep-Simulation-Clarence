@@ -10,7 +10,7 @@ import javax.swing.*;
 public class Board extends JPanel implements ActionListener {
     public static int bWidth; // Board width
     public static int bHeight; // Board height
-    private static int tic; // Simulation tic
+    public static int tic; // Simulation tic
     public static int GetTic()
     {
         return tic;
@@ -23,6 +23,9 @@ public class Board extends JPanel implements ActionListener {
     private List<Stat> stats;
 
     public static boolean debug;
+
+    public StatScreen statScreen;
+    public JFrame statFrame;
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -37,6 +40,21 @@ public class Board extends JPanel implements ActionListener {
         setBackground(Color.BLACK);
         setFocusable(true);
         setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
+
+        statScreen = new StatScreen(bWidth + 100, bHeight + 100);
+        statFrame = new JFrame();
+        statFrame.add(statScreen);
+        statFrame.setTitle("Statistics");
+        statFrame.setResizable(false);
+        statFrame.pack();
+        statFrame.setLocationRelativeTo(null);
+
+        statFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                showStats = false;
+                statFrame.setVisible(false);
+            }
+        });
 
         resetSimulation();
     }
@@ -66,6 +84,7 @@ public class Board extends JPanel implements ActionListener {
         }
 
         showStats = false;
+        statFrame.setVisible(false);
         stats = new ArrayList<>();
         addNewStat();
 
@@ -155,17 +174,15 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (!showStats) {
-            g.setColor(Color.darkGray);
-            g.fillRect(bWidth, 0, getWidth(), getHeight());
-            g.setColor(Color.gray);
-            g.fillRect(0, 0, getWidth(), 100);
-            drawEntities(g);
-            drawGrid(g);
-            drawCounts(g);
-            drawKey(g);
-        }
-        else {
+        g.setColor(Color.darkGray);
+        g.fillRect(bWidth, 0, getWidth(), getHeight());
+        g.setColor(Color.gray);
+        g.fillRect(0, 0, getWidth(), 100);
+        drawEntities(g);
+        drawGrid(g);
+        drawCounts(g);
+        drawKey(g);
+        if (showStats) {
             drawStats(g);
         }
     }
@@ -266,56 +283,31 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawStats(Graphics g) {
-        for (Stat stat : stats) {
-            System.out.println(stat);
-            int xPos = scaleXPos(stat.tic / 100);
-            g.setColor(Color.white);
-            int yPos = getHeight() - stat.numSheep;
-            g.fillOval(xPos, yPos, 5, 5);
-
-            g.setColor(Color.gray);
-            yPos = getHeight() - stat.numWolves;
-            g.fillOval(xPos, yPos, 5, 5);
-
-            g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
-            yPos = getHeight() - stat.numFlowers;
-            g.fillOval(xPos, yPos, 5, 5);
-
-            g.setColor(Color.green);
-            yPos = getHeight() - stat.numGrass;
-            g.fillOval(xPos, yPos, 5, 5);
-        }
-    }
-
-    private int scaleXPos(int xPos) {
-        int ratio = getWidth() / stats.size();
-        return xPos * ratio;
+        statScreen.drawStats(stats);
     }
 
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
     public void actionPerformed(ActionEvent e) {
-        if (!showStats) {
-            if (tic >= nextSpawn) {
-                spreadGrass();
-                if (entities.get(Ent.grass.get()).size() <= 2) {
-                    Grass newGrass = new Grass();
-                    do {
-                        newGrass.pos = Position.genRand(bWidth, bHeight, 20, 120, 40);
-                    } while (plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] != null);
-                    entities.get(Ent.grass.get()).add(newGrass);
-                    plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
-                }
+        if (tic >= nextSpawn) {
+            spreadGrass();
+            if (entities.get(Ent.grass.get()).size() <= 2) {
+                Grass newGrass = new Grass();
+                do {
+                    newGrass.pos = Position.genRand(bWidth, bHeight, 20, 120, 40);
+                } while (plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] != null);
+                entities.get(Ent.grass.get()).add(newGrass);
+                plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
             }
-            debugHover();
-
-            if (tic % 100 == 0) {
-                addNewStat();
-            }
-
-            tic++;
         }
+        debugHover();
+
+        if (tic % 100 == 0) {
+            addNewStat();
+        }
+
+        tic++;
         repaint();
         long time = System.nanoTime();
         long delta = (time - lastTime) / 1000000;
@@ -450,6 +442,7 @@ public class Board extends JPanel implements ActionListener {
 
             if (keyCode == KeyEvent.VK_S) {
                 showStats = !showStats;
+                statFrame.setVisible(showStats);
             }
         }
     }
