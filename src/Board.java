@@ -56,6 +56,9 @@ public class Board extends JPanel implements ActionListener {
             }
         });
 
+        showStats = false;
+        statFrame.setVisible(false);
+
         resetSimulation();
 
     }
@@ -83,9 +86,6 @@ public class Board extends JPanel implements ActionListener {
         for(Entity e : entities.get(Ent.grass.get())) {
             plantGrid[(e.pos.getY() - 100) / 40][e.pos.getX() / 40] = (Grass)e;
         }
-
-        showStats = false;
-        statFrame.setVisible(false);
         stats = new ArrayList<>();
         addNewStat();
 
@@ -329,6 +329,10 @@ public class Board extends JPanel implements ActionListener {
         int numGrass = entities.get(Ent.grass.get()).size();
         int numFlowers = entities.get(Ent.flower.get()).size();
         stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
+        if (stats.size() > 300) {
+            stats.remove(0);
+            statScreen.ticOffset++;
+        }
     }
 
 

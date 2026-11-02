@@ -7,10 +7,12 @@ public class StatScreen extends JPanel{
     public int height;
     public JPanel statPanel;
     private List<Stat> stats;
+    public int ticOffset;
 
     public StatScreen(int width, int height) {
         this.width = width;
         this.height = height;
+        ticOffset = 0;
         System.out.println(width + " " + height);
         init();
     }
@@ -36,7 +38,7 @@ public class StatScreen extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         for (Stat stat : stats) {
-            int xPos = scaleXPos(stat.tic / 100);
+            int xPos = scaleXPos(stat.tic / 100 - ticOffset);
             g.setColor(Color.white);
             int yPos = getHeight() - stat.numSheep;
             g.fillOval(xPos, yPos - 5, 5, 5);
