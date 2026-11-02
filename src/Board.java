@@ -20,6 +20,8 @@ public class Board extends JPanel implements ActionListener {
     public static List<Animal> babyAnimals;
     public static Plant[][] plantGrid;
 
+    private List<Stat> stats;
+
     public static boolean debug;
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
@@ -62,6 +64,9 @@ public class Board extends JPanel implements ActionListener {
         for(Entity e : entities.get(Ent.grass.get())) {
             plantGrid[(e.pos.getY() - 100) / 40][e.pos.getX() / 40] = (Grass)e;
         }
+
+        showStats = false;
+        stats = new ArrayList<>();
 
         tic = 1;
         timePassed = 0;
@@ -144,18 +149,23 @@ public class Board extends JPanel implements ActionListener {
             entities.get(Ent.flower.get()).add(new Flower());
         }
     }
-
+    public boolean showStats;
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(Color.darkGray);
-        g.fillRect(bWidth, 0, getWidth(), getHeight());
-        g.setColor(Color.gray);
-        g.fillRect(0, 0, getWidth(), 100);
-        drawEntities(g);
-        drawGrid(g);
-        drawCounts(g);
-        drawKey(g);
+        if (!showStats) {
+            g.setColor(Color.darkGray);
+            g.fillRect(bWidth, 0, getWidth(), getHeight());
+            g.setColor(Color.gray);
+            g.fillRect(0, 0, getWidth(), 100);
+            drawEntities(g);
+            drawGrid(g);
+            drawCounts(g);
+            drawKey(g);
+        }
+        else {
+            drawStats(g);
+        }
     }
 
     private void drawEntities(Graphics g) {
@@ -253,24 +263,57 @@ public class Board extends JPanel implements ActionListener {
         g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
     }
 
+    private void drawStats(Graphics g) {
+        for (Stat stat : stats) {
+            System.out.println(stat);
+            int xPos = stat.tic / 100;
+            g.setColor(Color.white);
+            int yPos = bHeight - stat.numSheep;
+            g.fillOval(xPos, yPos, 5, 5);
+
+            g.setColor(Color.gray);
+            yPos = bHeight - stat.numWolves;
+            g.fillOval(xPos, yPos, 5, 5);
+
+            g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+            yPos = bHeight - stat.numFlowers;
+            g.fillOval(xPos, yPos, 5, 5);
+
+            g.setColor(Color.green);
+            yPos = bHeight - stat.numGrass;
+            g.fillOval(xPos, yPos, 5, 5);
+        }
+    }
+
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
     public void actionPerformed(ActionEvent e) {
-        if (tic >= nextSpawn) {
-            spreadGrass();
-            if (entities.get(Ent.grass.get()).size() <= 2) {
-                Grass newGrass = new Grass();
-                do {
-                    newGrass.pos = Position.genRand(bWidth, bHeight, 20, 120, 40);
-                } while (plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] != null);
-                entities.get(Ent.grass.get()).add(newGrass);
-                plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
+        if (!showStats) {
+            if (tic >= nextSpawn) {
+                spreadGrass();
+                if (entities.get(Ent.grass.get()).size() <= 2) {
+                    Grass newGrass = new Grass();
+                    do {
+                        newGrass.pos = Position.genRand(bWidth, bHeight, 20, 120, 40);
+                    } while (plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] != null);
+                    entities.get(Ent.grass.get()).add(newGrass);
+                    plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
+                }
             }
+            debugHover();
+
+            if (tic % 100 == 0) {
+                int numSheep = entities.get(Ent.sheep.get()).size();
+                int numWolves = entities.get(Ent.wolf.get()).size();
+                int numGrass = entities.get(Ent.grass.get()).size();
+                int numFlowers = entities.get(Ent.flower.get()).size();
+                stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
+            }
+
+            tic++;
         }
-        debugHover();
         repaint();
-        tic++;
         long time = System.nanoTime();
         long delta = (time - lastTime) / 1000000;
         timePassed += delta;
@@ -392,6 +435,10 @@ public class Board extends JPanel implements ActionListener {
             if(keyCode == KeyEvent.VK_Q)
             {
                 debug = !debug;
+            }
+
+            if (keyCode == KeyEvent.VK_S) {
+                showStats = !showStats;
             }
         }
     }
