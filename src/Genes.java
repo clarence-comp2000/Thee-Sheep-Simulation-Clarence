@@ -1,6 +1,6 @@
 public class Genes {
 
-    private  static double mutationChance = 0.01;
+    private  static double mutationChance = 0.05;
     private double perception;
     private double speed;
     private int lifeSpan;

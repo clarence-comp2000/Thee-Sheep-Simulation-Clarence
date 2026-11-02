@@ -524,6 +524,7 @@ public abstract class Animal extends Entity{
     {
         targetEntity = null;
         reproduceTimer = genes.GetReproduceCooldown();
+        
         //hunger = hunger - 0.4f;
         //anim.hunger = anim.hunger - 0.4f;
         anim.targetEntity = null;
@@ -554,6 +555,7 @@ public abstract class Animal extends Entity{
         {
             hunger = genes.GetHungerCapacity();
         }
+        
         System.out.println("Creature "+ name + " ate entity worth "+ entity.nutrition + " nutrition. Total hunger now: " + hunger);
         entity.KillEntity();
         targetEntity = null;
@@ -606,6 +608,25 @@ public abstract class Animal extends Entity{
 
         g.setColor(Color.BLUE);
         g.drawString(reproduceTimer + " / " +  genes.GetReproduceCooldown(), xOffset, yOffset + 60);
+
+
+        if(parents != null)
+        {
+            for (Animal p : parents) {
+                if(p == null || !p.IsAlive()) continue;
+                g.drawLine(pos.getX(), pos.getY(), p.pos.getX(), p.pos.getY());
+            }
+        }
+
+        g.setColor(Color.PINK);
+        if(children != null)
+        {
+            for (Animal c : children) {
+                if(c == null || !c.IsAlive()) continue;
+                g.drawLine(pos.getX(), pos.getY(), c.pos.getX(), c.pos.getY());
+            }
+        }
+         
 
         
         if(targetEntity != null && targetEntity.IsAlive())

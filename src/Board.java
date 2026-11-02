@@ -37,6 +37,7 @@ public class Board extends JPanel implements ActionListener {
         setPreferredSize(new Dimension(bWidth, bHeight + 100));
 
         resetSimulation();
+
     }
 
     private void resetSimulation() {
@@ -114,20 +115,19 @@ public class Board extends JPanel implements ActionListener {
                 
                 15 * ((int)(Math.random()) + 6),
                 (int)(Math.random() * 1) + 1,
-                1500,
-                1750,
-                10,
-                20,
-                1
-                ,1.2,
+                (int)(Math.random() * 1000) + 750,
+                (int)(Math.random() * 1500) + 750,
+                (int)(Math.random() * 15) + 5,
+                (int)(Math.random() * 10) + 10,
+                1,
+                1.2,
                 20,
                 1000
                 
 
             );
 
-            float speed = (int)(Math.random() * 2) + 1;
-            float perception = 10 * ((int)(Math.random() * 2) + 10);
+
             Wolf newWolf = new Wolf(genes, new Animal[]{null, null}, (int) (Math.random()*  genes.GetLifespan() * 0.75));
             entities.get(Ent.wolf.get()).add(newWolf);
         }
@@ -207,6 +207,8 @@ public class Board extends JPanel implements ActionListener {
 
         nextX += bWidth / 4;
         g.drawString("Grass: " + entities.get(Ent.grass.get()).size(), nextX, yPos);
+
+
     }
     private int nextSpawn = 50;
     @Override
@@ -223,6 +225,8 @@ public class Board extends JPanel implements ActionListener {
                 plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
             }
         }
+
+
         debugHover();
         repaint();
         tic++;
@@ -231,6 +235,7 @@ public class Board extends JPanel implements ActionListener {
         timePassed += delta;
         lastTime = time;
 
+        
         CreateChildren();
         CleanUp(); 
     }
