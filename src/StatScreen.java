@@ -23,39 +23,35 @@ public class StatScreen extends JPanel{
         setPreferredSize(new Dimension(width, height));
     }
 
-    public void drawStats(List<Stat> stats) {
+    public void drawStats(List<Stat> stats, float flowerColourR, float flowerColourB) {
         this.stats = stats;
+        this.flowerColourR = flowerColourR;
+        this.flowerColourB = flowerColourB;
         repaint();
     }
 
-    float flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
-    float flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
+    private float flowerColourR;
+    private float flowerColourB;
     @Override 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         for (Stat stat : stats) {
-            System.out.println(stat);
             int xPos = scaleXPos(stat.tic / 100);
             g.setColor(Color.white);
             int yPos = getHeight() - stat.numSheep;
-            g.fillOval(xPos, yPos, 5, 5);
+            g.fillOval(xPos, yPos - 5, 5, 5);
 
             g.setColor(Color.gray);
             yPos = getHeight() - stat.numWolves;
-            g.fillOval(xPos, yPos, 5, 5);
+            g.fillOval(xPos, yPos - 5, 5, 5);
 
-
-            if (Board.tic % 100 == 0) {
-                flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
-                flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
-            }
-            g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+            g.setColor(new Color(flowerColourR, 0, flowerColourB));
             yPos = getHeight() - stat.numFlowers;
-            g.fillOval(xPos, yPos, 5, 5);
+            g.fillOval(xPos, yPos - 5, 5, 5);
 
             g.setColor(Color.green);
             yPos = getHeight() - stat.numGrass;
-            g.fillOval(xPos, yPos, 5, 5);
+            g.fillOval(xPos, yPos - 5, 5, 5);
         }
     }
 

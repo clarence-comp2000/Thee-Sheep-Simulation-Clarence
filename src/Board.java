@@ -283,7 +283,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawStats(Graphics g) {
-        statScreen.drawStats(stats);
+        statScreen.drawStats(stats, flowerKeyColourR, flowerKeyColourB);
     }
 
     private int nextSpawn = 50;
