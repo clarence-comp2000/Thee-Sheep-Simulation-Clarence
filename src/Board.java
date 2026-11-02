@@ -10,7 +10,7 @@ import javax.swing.*;
 public class Board extends JPanel implements ActionListener {
     public static int bWidth; // Board width
     public static int bHeight; // Board height
-    private static int tic; // Simulation tic
+    public static int tic; // Simulation tic
     public static int GetTic()
     {
         return tic;
@@ -20,7 +20,12 @@ public class Board extends JPanel implements ActionListener {
     public static List<Animal> babyAnimals;
     public static Plant[][] plantGrid;
 
+    private List<Stat> stats;
+
     public static boolean debug;
+
+    public StatScreen statScreen;
+    public JFrame statFrame;
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -35,6 +40,21 @@ public class Board extends JPanel implements ActionListener {
         setBackground(Color.BLACK);
         setFocusable(true);
         setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
+
+        statScreen = new StatScreen(bWidth + 100, bHeight + 100);
+        statFrame = new JFrame();
+        statFrame.add(statScreen);
+        statFrame.setTitle("Statistics");
+        statFrame.setResizable(false);
+        statFrame.pack();
+        statFrame.setLocationRelativeTo(null);
+
+        statFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                showStats = false;
+                statFrame.setVisible(false);
+            }
+        });
 
         resetSimulation();
 
@@ -63,6 +83,12 @@ public class Board extends JPanel implements ActionListener {
         for(Entity e : entities.get(Ent.grass.get())) {
             plantGrid[(e.pos.getY() - 100) / 40][e.pos.getX() / 40] = (Grass)e;
         }
+
+        showStats = false;
+        statFrame.setVisible(false);
+        stats = new ArrayList<>();
+        addNewStat();
+
 
         tic = 1;
         timePassed = 0;
@@ -144,7 +170,7 @@ public class Board extends JPanel implements ActionListener {
             entities.get(Ent.flower.get()).add(new Flower());
         }
     }
-
+    public boolean showStats;
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -156,6 +182,9 @@ public class Board extends JPanel implements ActionListener {
         drawGrid(g);
         drawCounts(g);
         drawKey(g);
+        if (showStats) {
+            drawStats(g);
+        }
     }
 
     private void drawEntities(Graphics g) {
@@ -255,6 +284,10 @@ public class Board extends JPanel implements ActionListener {
         g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
     }
 
+    private void drawStats(Graphics g) {
+        statScreen.drawStats(stats, flowerKeyColourR, flowerKeyColourB);
+    }
+
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
@@ -273,8 +306,13 @@ public class Board extends JPanel implements ActionListener {
 
 
         debugHover();
-        repaint();
+
+        if (tic % 100 == 0) {
+            addNewStat();
+        }
+
         tic++;
+        repaint();
         long time = System.nanoTime();
         long delta = (time - lastTime) / 1000000;
         timePassed += delta;
@@ -283,6 +321,14 @@ public class Board extends JPanel implements ActionListener {
         
         CreateChildren();
         CleanUp(); 
+    }
+
+    private void addNewStat() {
+        int numSheep = entities.get(Ent.sheep.get()).size();
+        int numWolves = entities.get(Ent.wolf.get()).size();
+        int numGrass = entities.get(Ent.grass.get()).size();
+        int numFlowers = entities.get(Ent.flower.get()).size();
+        stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
     }
 
 
@@ -397,6 +443,11 @@ public class Board extends JPanel implements ActionListener {
             if(keyCode == KeyEvent.VK_Q)
             {
                 debug = !debug;
+            }
+
+            if (keyCode == KeyEvent.VK_S) {
+                showStats = !showStats;
+                statFrame.setVisible(showStats);
             }
         }
     }
