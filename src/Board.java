@@ -34,7 +34,7 @@ public class Board extends JPanel implements ActionListener {
         setLayout(null);
         setBackground(Color.BLACK);
         setFocusable(true);
-        setPreferredSize(new Dimension(bWidth, bHeight + 100));
+        setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
 
         resetSimulation();
 
@@ -148,11 +148,14 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.setColor(Color.darkGray);
+        g.fillRect(bWidth, 0, getWidth(), getHeight());
         g.setColor(Color.gray);
-        g.fillRect(0, 0, bWidth, 100);
+        g.fillRect(0, 0, getWidth(), 100);
         drawEntities(g);
         drawGrid(g);
         drawCounts(g);
+        drawKey(g);
     }
 
     private void drawEntities(Graphics g) {
@@ -168,7 +171,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void drawGrid(Graphics g) {
         g.setColor(Color.white);
-        for (int i = 40; i < bWidth; i += 40) {
+        for (int i = 40; i <= bWidth; i += 40) {
             g.drawLine(i, 100, i, bHeight + 100);
         }
         for (int i = 100; i < bHeight + 100; i += 40) {
@@ -210,6 +213,48 @@ public class Board extends JPanel implements ActionListener {
 
 
     }
+
+    float flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
+    float flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
+    private void drawKey(Graphics g) {
+        FontMetrics metrics = g.getFontMetrics();
+        int height = getHeight() - bHeight;
+        int width = getWidth() - bWidth;
+        int yPos =  height + metrics.getHeight() + metrics.getAscent() / 4;
+        int xPos = getWidth() - (width + metrics.stringWidth("Key")) / 2;
+        g.drawString("Key", xPos, yPos);
+
+        yPos += metrics.getHeight() * 2;
+        xPos = getWidth() - (width + metrics.stringWidth("Sheep")) / 2;
+        g.drawString("Sheep", xPos, yPos);
+        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+
+        yPos += height;
+        xPos = getWidth() - (width + metrics.stringWidth("Wolf")) / 2;
+        g.drawString("Wolf", xPos, yPos);
+        g.setColor(Color.gray);
+        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+
+        g.setColor(Color.white);
+        yPos += height;
+        xPos = getWidth() - (width + metrics.stringWidth("Flower")) / 2;
+        g.drawString("Flower", xPos, yPos);
+        if (tic % 100 == 0) {
+            flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
+            flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
+        }
+        g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        
+
+        g.setColor(Color.white);
+        yPos += height;
+        xPos = getWidth() - (width + metrics.stringWidth("Grass")) / 2;
+        g.drawString("Grass", xPos, yPos);
+        g.setColor(Color.green);
+        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+    }
+
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
