@@ -41,19 +41,49 @@ public class StatScreen extends JPanel{
             int xPos = scaleXPos(stat.tic / 100 - ticOffset);
             g.setColor(Color.white);
             int yPos = getHeight() - stat.numSheep;
-            g.fillOval(xPos, yPos - 5, 5, 5);
+            g.fillOval(xPos, yPos - 4, 4, 4);
 
             g.setColor(Color.gray);
             yPos = getHeight() - stat.numWolves;
-            g.fillOval(xPos, yPos - 5, 5, 5);
+            g.fillOval(xPos, yPos - 4, 4, 4);
 
             g.setColor(new Color(flowerColourR, 0, flowerColourB));
             yPos = getHeight() - stat.numFlowers;
-            g.fillOval(xPos, yPos - 5, 5, 5);
+            g.fillOval(xPos, yPos - 4, 4, 4);
 
             g.setColor(Color.green);
             yPos = getHeight() - stat.numGrass;
-            g.fillOval(xPos, yPos - 5, 5, 5);
+            g.fillOval(xPos, yPos - 4, 4, 4);
+        }
+
+        for (int i = 0; i < stats.size() - 1; i++) {
+            Stat stat1 = stats.get(i);
+            Stat stat2 = stats.get(i + 1);
+
+            int xPos1 = scaleXPos(stat1.tic / 100 - ticOffset) + 2;
+            int xPos2 = scaleXPos(stat2.tic / 100 - ticOffset) + 2;
+
+            g.setColor(Color.white);
+            int yPos1 = getHeight() - stat1.numSheep - 2;
+            int yPos2 = getHeight() - stat2.numSheep - 2;
+            g.drawLine(xPos1, yPos1, xPos2, yPos2);
+
+            g.setColor(Color.gray);
+            yPos1 = getHeight() - stat1.numWolves - 2;
+            yPos2 = getHeight() - stat2.numWolves - 2;
+            g.drawLine(xPos1, yPos1, xPos2, yPos2);
+
+            g.setColor(new Color(flowerColourR, 0, flowerColourB));
+            yPos1 = getHeight() - stat1.numFlowers - 2;
+            yPos2 = getHeight() - stat2.numFlowers - 2;
+            g.drawLine(xPos1, yPos1, xPos2, yPos2);
+
+            g.setColor(Color.green);
+            yPos1 = getHeight() - stat1.numGrass - 2;
+            yPos2 = getHeight() - stat2.numGrass - 2;
+            g.drawLine(xPos1, yPos1, xPos2, yPos2);
+
+            
         }
     }
 
