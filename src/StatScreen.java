@@ -40,6 +40,12 @@ public class StatScreen extends JPanel{
         if (stats == null) {
             return;
         }
+
+        drawDots(g);
+        drawLines(g);
+    }
+
+    private void drawDots(Graphics g) {
         for (Stat stat : stats) {
             int xPos = scaleXPos(stat.tic / 100 - ticOffset);
             g.setColor(Color.white);
@@ -58,7 +64,9 @@ public class StatScreen extends JPanel{
             yPos = getHeight() - stat.numGrass;
             g.fillOval(xPos, yPos - 4, 4, 4);
         }
+    }
 
+    private void drawLines(Graphics g) {
         for (int i = 0; i < stats.size() - 1; i++) {
             Stat stat1 = stats.get(i);
             Stat stat2 = stats.get(i + 1);
