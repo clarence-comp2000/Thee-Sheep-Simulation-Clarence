@@ -58,6 +58,7 @@ public class Board extends JPanel implements ActionListener {
 
         showStats = false;
         statFrame.setVisible(false);
+        stats = new ArrayList<>();
 
         resetSimulation();
 
@@ -87,13 +88,12 @@ public class Board extends JPanel implements ActionListener {
             plantGrid[(e.pos.getY() - 100) / 40][e.pos.getX() / 40] = (Grass)e;
         }
 
-
-        stats = new ArrayList<>();
-        addNewStat();
-        statScreen.ticOffset = 0;
-
-
         tic = 1;
+        
+        stats.clear();
+        statScreen.ticOffset = 0;
+        addNewStat();
+
         timePassed = 0;
         nextSpawn = 300;
         timer = new Timer(10, this);

@@ -37,6 +37,9 @@ public class StatScreen extends JPanel{
     @Override 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (stats == null) {
+            return;
+        }
         for (Stat stat : stats) {
             int xPos = scaleXPos(stat.tic / 100 - ticOffset);
             g.setColor(Color.white);
