@@ -89,7 +89,7 @@ public class Board extends JPanel implements ActionListener {
         }
 
         tic = 1;
-        
+
         stats.clear();
         statScreen.ticOffset = 0;
         addNewStat();
@@ -332,7 +332,7 @@ public class Board extends JPanel implements ActionListener {
         int numGrass = entities.get(Ent.grass.get()).size();
         int numFlowers = entities.get(Ent.flower.get()).size();
         stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
-        if (stats.size() > 300) {
+        if (stats.size() > 246) {
             stats.remove(0);
             statScreen.ticOffset++;
         }
