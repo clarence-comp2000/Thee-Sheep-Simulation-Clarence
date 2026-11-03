@@ -86,8 +86,11 @@ public class Board extends JPanel implements ActionListener {
         for(Entity e : entities.get(Ent.grass.get())) {
             plantGrid[(e.pos.getY() - 100) / 40][e.pos.getX() / 40] = (Grass)e;
         }
+
+
         stats = new ArrayList<>();
         addNewStat();
+        statScreen.ticOffset = 0;
 
 
         tic = 1;
