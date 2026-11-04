@@ -115,11 +115,14 @@ public class StatScreen extends JPanel{
 
         g.drawLine(xOffset - 10, height - yOffset, width, height - yOffset);
         int ratio = getRatio();
-        int nextI = Math.max(ratio, 74);
-        int nextJ = (int)Math.floor((double)nextI / ratio * 100);
+        int nextI = Math.max(ratio, 82);
+        int nextJ = (int)Math.floor((double)nextI / ratio) * 100;
         for (int i = xOffset, j = ticOffset * 100; i < width; j += nextJ, i += nextI) {
             g.drawLine(i, height - yOffset, i, height - yOffset + 10);
-            g.drawString(j + "", i, height - yOffset + 10 + metrics.getHeight());
+            String str = j + "";
+            int strWidth = metrics.stringWidth(str);
+            int xPos = (i > xOffset) ? i - strWidth : i;
+            g.drawString(str, xPos, height - yOffset + 10 + metrics.getHeight());
         }
         String str = "0";
         int strWidth = metrics.stringWidth(str);
