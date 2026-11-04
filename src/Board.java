@@ -271,7 +271,7 @@ public class Board extends JPanel implements ActionListener {
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Flower")) / 2;
         g.drawString("Flower", xPos, yPos);
-        if (tic % 100 == 0) {
+        if (tic % 500 == 0) {
             flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
             flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
         }
