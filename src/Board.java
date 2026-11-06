@@ -32,6 +32,8 @@ public class Board extends JPanel implements ActionListener {
     private Image grassSprite;
     private Image flowerSprite;
 
+    private boolean started = false;
+
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -199,6 +201,10 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (!started) {
+            drawStart(g);
+            return;
+        }
         g.setColor(Color.darkGray);
         g.fillRect(bWidth, 0, getWidth(), getHeight());
         g.setColor(Color.gray);
@@ -256,6 +262,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     Font medium = new Font("Helvetica", Font.PLAIN, 16);
+    Font big = new Font("Helvetica", Font.PLAIN, 20);
     private long timePassed;
     private long lastTime = System.nanoTime();
     private void drawCounts(Graphics g) {
@@ -341,10 +348,74 @@ public class Board extends JPanel implements ActionListener {
         statScreen.drawStats(stats, flowerKeyColourR, flowerKeyColourB);
     }
 
+    private void drawStart(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+        g.setColor(Color.black);
+        g.fillRect(0, 0, width, height);
+        int totalHeight = 230; //Figured out after running code and printing final yPos
+        g.setColor(Color.white);
+        g.setFont(big);
+        FontMetrics metrics = g.getFontMetrics();
+        int strWidth = 0;
+        int strHeight = totalHeight / 2 - metrics.getHeight();
+
+        String str = "Instructions:";
+        strWidth = metrics.stringWidth(str);
+        int xPos = width / 2 - strWidth / 2;
+        int yPos = strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        g.setFont(medium);
+        metrics = g.getFontMetrics();
+        strWidth = 0;
+        strHeight = metrics.getHeight();
+
+        str = "Press \"R\" to reset the simulation";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"Q\" to show the debug view (or simply hover over animals you wish to see)";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"S\" to open the statistics screen, which shows the number of entities";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+        str = "present at a given time";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"I\" to get back to this screen (will pause the simulation)";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"Space\" to start";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+    }
+
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
     public void actionPerformed(ActionEvent e) {
+        if (!started) {
+            repaint();
+            return;
+        }
         if (tic >= nextSpawn) {
             spreadGrass();
             if (entities.get(Ent.grass.get()).size() <= 2) {
@@ -509,6 +580,15 @@ public class Board extends JPanel implements ActionListener {
             if (keyCode == KeyEvent.VK_S) {
                 showStats = !showStats;
                 statFrame.setVisible(showStats);
+            }
+
+            if (keyCode == KeyEvent.VK_SPACE && !started) {
+                started = true;
+                lastTime = System.nanoTime();
+            }
+
+            if (keyCode == KeyEvent.VK_I && started) {
+                started = false;
             }
         }
     }
