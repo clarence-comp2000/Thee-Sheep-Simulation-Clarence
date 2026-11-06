@@ -16,6 +16,7 @@ public class Wolf extends Animal {
         this.colour = Color.gray;
         entityType = Board.Ent.wolf;
 
+        sprite = getWolfImage();
         sprintOnFlee = true;
         sprintOnChase = true;
         giveUpChaseOnExhausted = true;
@@ -97,7 +98,7 @@ public class Wolf extends Animal {
         }
     }
 
-@Override
+    @Override
     protected void Reproduce(Animal partAnimal)
     {
         super.Reproduce(partAnimal);
@@ -115,5 +116,9 @@ public class Wolf extends Animal {
         if(state == AnimalState.roaming && hunger < 0.65) {
             state = AnimalState.lookingForFood;
         }
+    }
+
+    public static Image getWolfImage() {
+        return Toolkit.getDefaultToolkit().getImage("images/wolf.png");
     }
 }

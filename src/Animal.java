@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.util.ArrayList;
 
 
@@ -119,6 +120,7 @@ public abstract class Animal extends Entity{
 
         this.state = AnimalState.roaming;
         this.randPos = Position.genRand(Board.bWidth, Board.bHeight, 0, 100, 40);
+        this.sprite = null;
     }
 
     /*
@@ -586,7 +588,12 @@ public abstract class Animal extends Entity{
         {
             size = 30;
         }
-        g.fillRect(pos.getX()-20, pos.getY()-20, size,size);
+        if (sprite == null) {
+            g.fillRect(pos.getX()-20, pos.getY()-20, size,size);
+        }
+        else {
+            g.drawImage(sprite, pos.getX()-20, pos.getY()-20, size, size, null);
+        }
 
         if(!Board.debug && !this.debug) return;
         g.drawOval(pos.getX() - (int)genes.GetPerception()/2, pos.getY() - (int)genes.GetPerception()/2, (int)genes.GetPerception(), (int)genes.GetPerception());

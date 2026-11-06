@@ -1,10 +1,13 @@
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 
 public class Grass extends Plant{
     public Grass()
     {
         super("Grass", Color.green);
+        this.sprite = getGrassImage();
         this.nutrition = 0.3f;
     }
 
@@ -33,5 +36,9 @@ public class Grass extends Plant{
         newG.pos = new Position(newX * 40 + 20, newY * 40 + 120);
         Board.plantGrid[newY][newX] = newG;
         return newG;
+    }
+
+    public static Image getGrassImage() {
+        return Toolkit.getDefaultToolkit().getImage("images/grass.png");
     }
 }
