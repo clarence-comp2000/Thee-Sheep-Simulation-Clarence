@@ -43,7 +43,8 @@ public class Board extends JPanel implements ActionListener {
     private void init() {
         addKeyListener(new KeyInput());
         setLayout(null);
-        setBackground(Color.BLACK);
+        Color darkGreen = new Color(0, 210, 0);
+        setBackground(darkGreen);
         setFocusable(true);
         setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
 
