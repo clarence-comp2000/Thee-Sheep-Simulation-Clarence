@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
@@ -190,6 +189,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    /*
     private void drawEntities(Graphics g) {
         entities.stream()
                 .forEach(list -> {
@@ -200,6 +200,15 @@ public class Board extends JPanel implements ActionListener {
                         .forEach(animal -> animal.AnimalBehaviour());
                 });
     }
+    */
+
+    private void drawEntities(Graphics g) {
+        entities.stream()
+            .flatMap(List::stream)
+            .filter(Entity::IsAlive)
+            .forEach(entity -> entity.drawEntity(g));
+            
+    }
 
     private void drawGrid(Graphics g) {
         g.setColor(Color.white);
@@ -209,6 +218,15 @@ public class Board extends JPanel implements ActionListener {
         for (int i = 100; i < bHeight + 100; i += 40) {
             g.drawLine(0, i, bWidth, i);
         }
+    }
+
+    private void updateAnimals() {
+        entities.stream()
+            .flatMap(List::stream)
+            .filter(entity -> entity instanceof Animal)
+            .map(entity -> (Animal) entity)
+            .filter(Animal::IsAlive)
+            .forEach(Animal::AnimalBehaviour);
     }
 
     Font medium = new Font("Helvetica", Font.PLAIN, 16);
@@ -310,20 +328,38 @@ public class Board extends JPanel implements ActionListener {
 
         debugHover();
 
-        if (tic % 100 == 0) {
+        // if (tic % 100 == 0) {
+        //     addNewStat();
+        // }
+
+        // tic++;
+        // repaint();
+        // long time = System.nanoTime();
+        // long delta = (time - lastTime) / 1000000;
+        // timePassed += delta;
+        // lastTime = time;
+
+        
+        // CreateChildren();
+        // CleanUp(); 
+
+        updateAnimals();
+
+        CreateChildren();
+        CleanUp();
+
+        tic++;
+
+        if(tic % 100 == 0) {
             addNewStat();
         }
 
-        tic++;
-        repaint();
         long time = System.nanoTime();
         long delta = (time - lastTime) / 1000000;
         timePassed += delta;
         lastTime = time;
 
-        
-        CreateChildren();
-        CleanUp(); 
+        repaint();
     }
 
     private void addNewStat() {
