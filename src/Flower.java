@@ -40,7 +40,9 @@ public class Flower extends Plant {
             int r = (rgb >> 16) & 0xff;
             int g = (rgb >> 8) & 0xff;
             int b = rgb & 0xff;
-
+            if (r != g || r != b || g != b) {
+                return rgb;
+            }
             r *= pColour.getRed() / 256.0;
             g *= pColour.getGreen() / 256.0;
             b *= pColour.getBlue() / 256.0;

@@ -1,14 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
@@ -30,6 +26,12 @@ public class Board extends JPanel implements ActionListener {
 
     public StatScreen statScreen;
     public JFrame statFrame;
+
+    private Image sheepSprite;
+    private Image wolfSprite;
+    private Image grassSprite;
+    private Image flowerSprite;
+
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -63,6 +65,11 @@ public class Board extends JPanel implements ActionListener {
         showStats = false;
         statFrame.setVisible(false);
         stats = new ArrayList<>();
+
+        sheepSprite = Sheep.getSheepImage();
+        wolfSprite = Wolf.getWolfImage();
+        grassSprite = Grass.getGrassImage();
+        flowerSprite = Flower.getFlowerImage(new Color(flowerKeyColourR, 0, flowerKeyColourB));
 
         resetSimulation();
 
@@ -294,13 +301,15 @@ public class Board extends JPanel implements ActionListener {
         yPos += metrics.getHeight() * 2;
         xPos = getWidth() - (width + metrics.stringWidth("Sheep")) / 2;
         g.drawString("Sheep", xPos, yPos);
-        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(sheepSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Wolf")) / 2;
         g.drawString("Wolf", xPos, yPos);
-        g.setColor(Color.gray);
-        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(Color.gray);
+        // g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(wolfSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
         g.setColor(Color.white);
         yPos += height;
@@ -309,17 +318,21 @@ public class Board extends JPanel implements ActionListener {
         if (tic % 500 == 0) {
             flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
             flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
+            Color flowerKeyColour = new Color(flowerKeyColourR, 0, flowerKeyColourB);
+            flowerSprite = Flower.getFlowerImage(flowerKeyColour);
         }
-        g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
-        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+        // g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(flowerSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
 
         g.setColor(Color.white);
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Grass")) / 2;
         g.drawString("Grass", xPos, yPos);
-        g.setColor(Color.green);
-        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(Color.green);
+        // g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(grassSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
     }
 
     private void drawStats(Graphics g) {
