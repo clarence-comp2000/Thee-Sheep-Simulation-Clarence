@@ -28,7 +28,7 @@ public class Board extends JPanel implements ActionListener {
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
-        
+
         init();
     }
 
@@ -110,13 +110,13 @@ public class Board extends JPanel implements ActionListener {
     private void spawnEntities() {
         //Spawn sheep
         int startAmount = (int)(Math.random() * 5 + 7);
-        
+
         for (int i = 0; i < startAmount; i++) {
 
             Genes genes = new Genes(
                 20 * (int)(Math.random()  + 8),
                 (int)(Math.random()) + 1,
-                
+
                 2500,
                 3000,
                 2,
@@ -125,7 +125,7 @@ public class Board extends JPanel implements ActionListener {
                 2,
                 20,
                 100
-                
+
 
             );
             /*
@@ -140,23 +140,33 @@ public class Board extends JPanel implements ActionListener {
         startAmount = (int)(Math.random() * 3 + 2);
         for (int i = 0; i < startAmount; i++) {
             Genes genes = new Genes(
-                
-                15 * ((int)(Math.random()) + 6),
-                (int)(Math.random() * 1) + 1,
-                (int)(Math.random() * 1000) + 750,
+//
+//                 15 * ((int)(Math.random()) + 6),
+//                 (int)(Math.random() * 1) + 1,
+//                 (int)(Math.random() * 1000) + 750,
+//                 (int)(Math.random() * 1500) + 750,
+//                 (int)(Math.random() * 15) + 5,
+//                 (int)(Math.random() * 10) + 10,
+//                 1,
+//                 1.2,
+//                 20,
+//                 1000
+
+                90,
+                2,
+                (int)(Math.random() * 1000) + 2500, // lifespan
                 (int)(Math.random() * 1500) + 750,
                 (int)(Math.random() * 15) + 5,
                 (int)(Math.random() * 10) + 10,
                 1,
-                1.2,
+                2.0,
                 20,
                 1000
-                
 
             );
 
 
-            Wolf newWolf = new Wolf(genes, new Animal[]{null, null}, (int) (Math.random()*  genes.GetLifespan() * 0.75));
+            Wolf newWolf = new Wolf(genes, new Animal[]{null, null}, (int) (Math.random()*  genes.GetLifespan() * 0.20)); // changed from 0.75
             entities.get(Ent.wolf.get()).add(newWolf);
         }
 
@@ -202,12 +212,13 @@ public class Board extends JPanel implements ActionListener {
     }
     */
 
+    // this pretty much prevents additional repaints from affecting the simulation (for rendering only)
     private void drawEntities(Graphics g) {
         entities.stream()
             .flatMap(List::stream)
             .filter(Entity::IsAlive)
             .forEach(entity -> entity.drawEntity(g));
-            
+
     }
 
     private void drawGrid(Graphics g) {
@@ -220,6 +231,7 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+    // updates living animal once per simulation tick (streams used to process the nested entity collectionz)
     private void updateAnimals() {
         entities.stream()
             .flatMap(List::stream)
@@ -295,7 +307,7 @@ public class Board extends JPanel implements ActionListener {
         }
         g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
         g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
-        
+
 
         g.setColor(Color.white);
         yPos += height;
@@ -339,10 +351,12 @@ public class Board extends JPanel implements ActionListener {
         // timePassed += delta;
         // lastTime = time;
 
-        
-        // CreateChildren();
-        // CleanUp(); 
 
+        // CreateChildren();
+        // CleanUp();
+
+
+        // keeps simulation behaviour independent of rendering and updates the simulation before drawing next frame
         updateAnimals();
 
         CreateChildren();
@@ -350,6 +364,7 @@ public class Board extends JPanel implements ActionListener {
 
         tic++;
 
+        // records population changes after the entities are updated
         if(tic % 100 == 0) {
             addNewStat();
         }
@@ -422,11 +437,11 @@ public class Board extends JPanel implements ActionListener {
         newFlower = newGrass.stream()
                             .filter(en -> en instanceof Flower)
                             .collect(Collectors.toList());
-        
+
         newGrass = newGrass.stream()
                             .filter(en -> en instanceof Grass)
                             .collect(Collectors.toList());
-        
+
         entities.get(Ent.grass.get()).addAll(newGrass);
         entities.get(Ent.flower.get()).addAll(newFlower);
         nextSpawn = tic + (int)(Math.random() * 200 + 75);
@@ -434,7 +449,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void CreateChildren()
     {
-        
+
         babyAnimals.stream()
                     .forEach(baby -> entities.get(baby.GetType().get()).add(baby));
 
@@ -443,13 +458,13 @@ public class Board extends JPanel implements ActionListener {
 
     private void CleanUp()
     {
-        
+
         for(List<Entity> subList : entities)
         {
             for(int i = subList.size() -1; i >= 0; i--)
             {
                 if(!subList.get(i).IsAlive())
-                {   
+                {
                     if (subList.get(i) instanceof Plant) {
                         plantGrid[(subList.get(i).pos.getY() - 100) / 40][subList.get(i).pos.getX() / 40] = null;
                     }
@@ -463,7 +478,7 @@ public class Board extends JPanel implements ActionListener {
         sheep(2), wolf(3), flower(1), grass(0);
 
         private final int index;
-        
+
         private Ent(int index) {
             this.index = index;
         }
@@ -474,7 +489,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private class KeyInput extends KeyAdapter {
-        @Override 
+        @Override
         public void keyPressed(KeyEvent e) {
             int keyCode = e.getKeyCode();
             if (keyCode == KeyEvent.VK_R) {

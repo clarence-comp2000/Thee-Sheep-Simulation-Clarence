@@ -7,7 +7,7 @@ public abstract class Animal extends Entity{
 
     protected enum AnimalState
     {
-        lookingForFood, 
+        lookingForFood,
         chasingFood,
         lookingForMate,
         chasingMate,
@@ -45,13 +45,13 @@ public abstract class Animal extends Entity{
     {
         return stealth;
     }
-    
+
 
     protected double sprintMultiplier = 2;
 
     protected int maxStamina = 400;
 
-    
+
 
     protected int staminaUseRate = 2;
 
@@ -90,7 +90,7 @@ public abstract class Animal extends Entity{
 
 
     protected Animal chasingAnimal; //creature that is chasing THIS animal
-    
+
     //#region
     protected boolean sprintOnChase = false;
     protected boolean sprintOnFlee = false;
@@ -98,7 +98,7 @@ public abstract class Animal extends Entity{
 
     public Animal()
     {
-        
+
     }
 
     public Animal(Genes genes, Animal[] parents, int age)
@@ -116,7 +116,7 @@ public abstract class Animal extends Entity{
             this.pos.setX(parents[0].pos.getX());
             this.pos.setY(parents[0].pos.getY());
         }
-            
+
         this.state = AnimalState.roaming;
         this.randPos = Position.genRand(Board.bWidth, Board.bHeight, 0, 100, 40);
     }
@@ -130,7 +130,7 @@ public abstract class Animal extends Entity{
         }else{
             this.name = nameList[(int)(Math.random() * nameList.length)];
         }
-        
+
         this.speed = speed;
         this.perception = perception;
         this.lifeSpan = lifeSpan * 400;
@@ -153,12 +153,12 @@ public abstract class Animal extends Entity{
     //Moves animal towards destination, returns true if it is at the destination already with buffer.
     private boolean Move(Position destination, int buffer, boolean sprint)
     {
-        
+
         Position direction = pos.dir(destination);
         if(Math.abs(direction.getX()) <= buffer && Math.abs(direction.getY()) <= buffer){return true;}
-        
+
         double moveSpeed = genes.GetSpeed();
-        
+
         if(sprint && stamina > 0 && !exhausted)
         {
             moveSpeed *= genes.GetSprintMultiplier();
@@ -169,7 +169,7 @@ public abstract class Animal extends Entity{
                 stamina = 0;
             }
         }
-        
+
         if(Math.abs(direction.getX()) > Math.abs(direction.getY()))
         {
             pos.setX((int)(pos.getX() + moveSpeed * Math.signum(direction.getX())));
@@ -184,10 +184,12 @@ public abstract class Animal extends Entity{
     {
         UpdateStats();
 
-        if(!IsAlive()) return;
-        UpdateStats();
-       
-        
+        // animal may die from starvation or old age during UpdateStats()
+        // essentially stops here to prevent it from performing another action
+        if(!IsAlive()) {
+            return;
+        }
+
         switch(state){
             case AnimalState.lookingForFood:
             {
@@ -220,7 +222,7 @@ public abstract class Animal extends Entity{
                 break;
             }
 
-        }     
+        }
     }
 
     protected void UpdateStats()
@@ -229,7 +231,7 @@ public abstract class Animal extends Entity{
         {
             reproduceTimer--;
         }
-        
+
         hunger -= genes.GetHungerRate();
 
         age += 1;
@@ -238,7 +240,7 @@ public abstract class Animal extends Entity{
             stamina += genes.GetStaminaRecoverRate();
             //hunger -= 0.5 * genes.GetHungerRate();
         }
-        
+
 
         if(stamina >= genes.GetMaxStamina())
         {
@@ -259,7 +261,7 @@ public abstract class Animal extends Entity{
                 System.out.println(name + " Died of old age" + age);
                 KillEntity();
             }
-            
+
         }
     }
 
@@ -290,8 +292,8 @@ public abstract class Animal extends Entity{
             fleeTarget = GetFleeTarget(chasingAnimal);
         }
 
-      
-        
+
+
     }
 
     private Position GetFleeTarget(Animal hunter)
@@ -308,12 +310,12 @@ public abstract class Animal extends Entity{
         {
             newWidth = Board.bWidth - hunter.pos.getX();
             newBufferX += hunter.pos.getX();
-      
-            
-           
+
+
+
         }else{
             newWidth = hunter.pos.getX();
-            
+
 
         }
 
@@ -321,7 +323,7 @@ public abstract class Animal extends Entity{
         {
             newHeight = Board.bHeight - hunter.pos.getY();
             newBufferY += hunter.pos.getY();
-            
+
 
         }else{
             newHeight = hunter.pos.getY();
@@ -359,9 +361,9 @@ public abstract class Animal extends Entity{
             }else
             {
                 RoamRandomly();
-            
+
             }
-        
+
         }else{
             targetEntity = null;
             RoamRandomly();
@@ -371,9 +373,9 @@ public abstract class Animal extends Entity{
 
     protected void ChasingFood()
     {
-        
-        if(targetEntity == null || 
-            !targetEntity.IsAlive() || 
+
+        if(targetEntity == null ||
+            !targetEntity.IsAlive() ||
             pos.dist(targetEntity.pos) > genes.GetPerception())
         {
            targetEntity = null;
@@ -383,10 +385,13 @@ public abstract class Animal extends Entity{
 
         if(exhausted && giveUpChaseOnExhausted)
         {
+            // stops chasing when exhausted and recovers stamina before hunting again
+            targetEntity = null;
             state = AnimalState.resting;
+            return;
         }
 
-   
+
         if(Move(targetEntity.pos, 10, sprintOnChase))
         {
             EatFood(targetEntity);
@@ -410,11 +415,11 @@ public abstract class Animal extends Entity{
         targetEntity = ent;
         state = AnimalState.chasingMate;
     }
-    
+
     protected void LookingForMate()
     {
         Entity closest = null;
-        double closestDist = 99999;        
+        double closestDist = 99999;
         for (Entity ent: Board.entities.get(entityType.get()) )
         {
             if(ent == null || ent == this)
@@ -426,7 +431,7 @@ public abstract class Animal extends Entity{
                 {
                     //other creature is not ready to mate
                     a.AttractMate(this);
-                    
+
                 }else{
                     continue;
                 }
@@ -440,7 +445,7 @@ public abstract class Animal extends Entity{
         }
 
 
-            
+
 
         if(closest != null)
         {
@@ -454,14 +459,14 @@ public abstract class Animal extends Entity{
         {
             RoamRandomly();
         }
-        
+
     }
 
     protected void RoamRandomly()
     {
         boolean moved = Move(randPos, 10, false);
         if (moved && (wait == 0 || hunger < 0.25))
-        {   
+        {
             wait = 100;
             randPos = Position.genRand(Board.bWidth, Board.bHeight, 20, 120, 40);
         }
@@ -485,7 +490,7 @@ public abstract class Animal extends Entity{
     }
     protected void ChasingMate()
     {
-        
+
         if(hunger < hungerToReproduce)
         {
             state = AnimalState.lookingForFood;
@@ -533,7 +538,7 @@ public abstract class Animal extends Entity{
     {
         targetEntity = null;
         reproduceTimer = genes.GetReproduceCooldown();
-        
+
         //hunger = hunger - 0.4f;
         //anim.hunger = anim.hunger - 0.4f;
         anim.targetEntity = null;
@@ -542,10 +547,6 @@ public abstract class Animal extends Entity{
         state = AnimalState.resting;
 
 
-
-        //temp
-        
-        
     }
     public Entity LookForFood()
     {
@@ -553,18 +554,18 @@ public abstract class Animal extends Entity{
         return null;
     }
 
-    
+
     public void EatFood(Entity entity)
     {
-       
+
         hunger += entity.nutrition;
         stamina += entity.nutrition * 200;
-        
+
         if(hunger > genes.GetHungerCapacity())
         {
             hunger = genes.GetHungerCapacity();
         }
-        
+
         System.out.println("Creature "+ name + " ate entity worth "+ entity.nutrition + " nutrition. Total hunger now: " + hunger);
         entity.KillEntity();
         targetEntity = null;
@@ -573,7 +574,7 @@ public abstract class Animal extends Entity{
 
 
 
-    
+
 
 
     @Override
@@ -612,7 +613,7 @@ public abstract class Animal extends Entity{
         }else{
             g.setColor(Color.YELLOW);
         }
-        
+
         g.drawString(stamina + " / " +  genes.GetMaxStamina(), xOffset, yOffset + 50);
 
         g.setColor(Color.BLUE);
@@ -635,17 +636,17 @@ public abstract class Animal extends Entity{
                 g.drawLine(pos.getX(), pos.getY(), c.pos.getX(), c.pos.getY());
             }
         }
-         
 
-        
+
+
         if(targetEntity != null && targetEntity.IsAlive())
         {
             g.setColor(Color.RED);
             g.drawLine(pos.getX(), pos.getY(), targetEntity.pos.getX(), targetEntity.pos.getY());
         }
-        
-        
 
-        
+
+
+
     }
 }
