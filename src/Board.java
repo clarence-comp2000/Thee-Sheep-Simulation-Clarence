@@ -340,26 +340,6 @@ public class Board extends JPanel implements ActionListener {
 
         debugHover();
 
-<<<<<<< HEAD
-=======
-        // if (tic % 100 == 0) {
-        //     addNewStat();
-        // }
-
-        // tic++;
-        // repaint();
-        // long time = System.nanoTime();
-        // long delta = (time - lastTime) / 1000000;
-        // timePassed += delta;
-        // lastTime = time;
-
-
-        // CreateChildren();
-        // CleanUp();
-
-
-        // keeps simulation behaviour independent of rendering and updates the simulation before drawing next frame
->>>>>>> 03686bc943231cc4bef2dce5a08ebdb1aeb6858c
         updateAnimals();
 
         CreateChildren();

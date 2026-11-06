@@ -188,6 +188,7 @@ public abstract class Animal extends Entity{
         if(!IsAlive()) {
             return;
         }
+        UpdateStats();
 
         switch(state){
             case AnimalState.lookingForFood:
