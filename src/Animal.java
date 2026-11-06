@@ -182,6 +182,7 @@ public abstract class Animal extends Entity{
     int wait = 0;
     public void AnimalBehaviour()
     {
+
         if(!IsAlive()) return;
         UpdateStats();
        
