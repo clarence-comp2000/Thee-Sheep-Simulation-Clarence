@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
     public static int bWidth; // Board width
     public static int bHeight; // Board height
-    private static int tic; // Simulation tic
+    public static int tic; // Simulation tic
     public static int GetTic()
     {
         return tic;
@@ -20,7 +19,12 @@ public class Board extends JPanel implements ActionListener {
     public static List<Animal> babyAnimals;
     public static Plant[][] plantGrid;
 
+    private List<Stat> stats;
+
     public static boolean debug;
+
+    public StatScreen statScreen;
+    public JFrame statFrame;
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -36,7 +40,27 @@ public class Board extends JPanel implements ActionListener {
         setFocusable(true);
         setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
 
+        statScreen = new StatScreen(bWidth + 100, bHeight + 100);
+        statFrame = new JFrame();
+        statFrame.add(statScreen);
+        statFrame.setTitle("Statistics");
+        statFrame.setResizable(false);
+        statFrame.pack();
+        statFrame.setLocationRelativeTo(null);
+
+        statFrame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+                showStats = false;
+                statFrame.setVisible(false);
+            }
+        });
+
+        showStats = false;
+        statFrame.setVisible(false);
+        stats = new ArrayList<>();
+
         resetSimulation();
+
     }
 
     private void resetSimulation() {
@@ -64,6 +88,11 @@ public class Board extends JPanel implements ActionListener {
         }
 
         tic = 1;
+
+        stats.clear();
+        statScreen.ticOffset = 0;
+        addNewStat();
+
         timePassed = 0;
         nextSpawn = 300;
         timer = new Timer(10, this);
@@ -114,20 +143,19 @@ public class Board extends JPanel implements ActionListener {
                 
                 15 * ((int)(Math.random()) + 6),
                 (int)(Math.random() * 1) + 1,
-                1500,
-                1750,
-                10,
-                20,
-                1
-                ,1.2,
+                (int)(Math.random() * 1000) + 750,
+                (int)(Math.random() * 1500) + 750,
+                (int)(Math.random() * 15) + 5,
+                (int)(Math.random() * 10) + 10,
+                1,
+                1.2,
                 20,
                 1000
                 
 
             );
 
-            float speed = (int)(Math.random() * 2) + 1;
-            float perception = 10 * ((int)(Math.random() * 2) + 10);
+
             Wolf newWolf = new Wolf(genes, new Animal[]{null, null}, (int) (Math.random()*  genes.GetLifespan() * 0.75));
             entities.get(Ent.wolf.get()).add(newWolf);
         }
@@ -144,7 +172,7 @@ public class Board extends JPanel implements ActionListener {
             entities.get(Ent.flower.get()).add(new Flower());
         }
     }
-
+    public boolean showStats;
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -156,8 +184,12 @@ public class Board extends JPanel implements ActionListener {
         drawGrid(g);
         drawCounts(g);
         drawKey(g);
+        if (showStats) {
+            drawStats(g);
+        }
     }
 
+    /*
     private void drawEntities(Graphics g) {
         entities.stream()
                 .forEach(list -> {
@@ -168,6 +200,15 @@ public class Board extends JPanel implements ActionListener {
                         .forEach(animal -> animal.AnimalBehaviour());
                 });
     }
+    */
+
+    private void drawEntities(Graphics g) {
+        entities.stream()
+            .flatMap(List::stream)
+            .filter(Entity::IsAlive)
+            .forEach(entity -> entity.drawEntity(g));
+            
+    }
 
     private void drawGrid(Graphics g) {
         g.setColor(Color.white);
@@ -177,6 +218,15 @@ public class Board extends JPanel implements ActionListener {
         for (int i = 100; i < bHeight + 100; i += 40) {
             g.drawLine(0, i, bWidth, i);
         }
+    }
+
+    private void updateAnimals() {
+        entities.stream()
+            .flatMap(List::stream)
+            .filter(entity -> entity instanceof Animal)
+            .map(entity -> (Animal) entity)
+            .filter(Animal::IsAlive)
+            .forEach(Animal::AnimalBehaviour);
     }
 
     Font medium = new Font("Helvetica", Font.PLAIN, 16);
@@ -210,6 +260,8 @@ public class Board extends JPanel implements ActionListener {
 
         nextX += bWidth / 4;
         g.drawString("Grass: " + entities.get(Ent.grass.get()).size(), nextX, yPos);
+
+
     }
 
     float flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
@@ -237,7 +289,7 @@ public class Board extends JPanel implements ActionListener {
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Flower")) / 2;
         g.drawString("Flower", xPos, yPos);
-        if (tic % 100 == 0) {
+        if (tic % 500 == 0) {
             flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
             flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
         }
@@ -251,6 +303,10 @@ public class Board extends JPanel implements ActionListener {
         g.drawString("Grass", xPos, yPos);
         g.setColor(Color.green);
         g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+    }
+
+    private void drawStats(Graphics g) {
+        statScreen.drawStats(stats, flowerKeyColourR, flowerKeyColourB);
     }
 
     private int nextSpawn = 50;
@@ -268,16 +324,54 @@ public class Board extends JPanel implements ActionListener {
                 plantGrid[(newGrass.pos.getY() - 100) / 40][newGrass.pos.getX() / 40] = newGrass;
             }
         }
+
+
         debugHover();
-        repaint();
+
+        // if (tic % 100 == 0) {
+        //     addNewStat();
+        // }
+
+        // tic++;
+        // repaint();
+        // long time = System.nanoTime();
+        // long delta = (time - lastTime) / 1000000;
+        // timePassed += delta;
+        // lastTime = time;
+
+        
+        // CreateChildren();
+        // CleanUp(); 
+
+        updateAnimals();
+
+        CreateChildren();
+        CleanUp();
+
         tic++;
+
+        if(tic % 100 == 0) {
+            addNewStat();
+        }
+
         long time = System.nanoTime();
         long delta = (time - lastTime) / 1000000;
         timePassed += delta;
         lastTime = time;
 
-        CreateChildren();
-        CleanUp(); 
+        repaint();
+    }
+
+    private void addNewStat() {
+        int numSheep = entities.get(Ent.sheep.get()).size();
+        int numWolves = entities.get(Ent.wolf.get()).size();
+        int numGrass = entities.get(Ent.grass.get()).size();
+        int numFlowers = entities.get(Ent.flower.get()).size();
+        stats.add(new Stat(numSheep, numWolves, numGrass, numFlowers, tic));
+        if (stats.size() > 246) {
+            stats.remove(0);
+            statScreen.ticOffset++;
+        }
     }
 
 
@@ -392,6 +486,11 @@ public class Board extends JPanel implements ActionListener {
             if(keyCode == KeyEvent.VK_Q)
             {
                 debug = !debug;
+            }
+
+            if (keyCode == KeyEvent.VK_S) {
+                showStats = !showStats;
+                statFrame.setVisible(showStats);
             }
         }
     }

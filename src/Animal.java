@@ -182,42 +182,11 @@ public abstract class Animal extends Entity{
     int wait = 0;
     public void AnimalBehaviour()
     {
-        if(reproduceTimer >= 0)
-        {
-            reproduceTimer--;
-        }
+        UpdateStats();
+
         if(!IsAlive()) return;
-        hunger -= genes.GetHungerRate();
-
-        age += 1;
-        if(state != AnimalState.fleeing && stamina < genes.GetMaxStamina())
-        {
-            stamina += genes.GetStaminaRecoverRate();
-            //hunger -= 0.5 * genes.GetHungerRate();
-        }
-        
-
-        if(stamina >= genes.GetMaxStamina())
-        {
-            exhausted = false;
-            stamina = genes.GetMaxStamina();
-        }
-        if(hunger < 0)
-        {
-            System.out.println(name + " Starved");
-            hunger = 0;
-            KillEntity();
-            return;
-        }else if(age > genes.GetLifespan())
-        {
-            double roll = Math.random();
-            if(roll < 0.001)
-            {
-                System.out.println(name + " Died of old age" + age);
-                KillEntity();
-            }
-            
-        }
+        UpdateStats();
+       
         
         switch(state){
             case AnimalState.lookingForFood:
@@ -252,6 +221,46 @@ public abstract class Animal extends Entity{
             }
 
         }     
+    }
+
+    protected void UpdateStats()
+    {
+         if(reproduceTimer >= 0)
+        {
+            reproduceTimer--;
+        }
+        
+        hunger -= genes.GetHungerRate();
+
+        age += 1;
+        if(state != AnimalState.fleeing && stamina < genes.GetMaxStamina())
+        {
+            stamina += genes.GetStaminaRecoverRate();
+            //hunger -= 0.5 * genes.GetHungerRate();
+        }
+        
+
+        if(stamina >= genes.GetMaxStamina())
+        {
+            exhausted = false;
+            stamina = genes.GetMaxStamina();
+        }
+        if(hunger < 0)
+        {
+            System.out.println(name + " Starved");
+            hunger = 0;
+            KillEntity();
+            return;
+        }else if(age > genes.GetLifespan())
+        {
+            double roll = Math.random();
+            if(roll < 0.005)
+            {
+                System.out.println(name + " Died of old age" + age);
+                KillEntity();
+            }
+            
+        }
     }
 
     protected void Rest()
@@ -524,6 +533,7 @@ public abstract class Animal extends Entity{
     {
         targetEntity = null;
         reproduceTimer = genes.GetReproduceCooldown();
+        
         //hunger = hunger - 0.4f;
         //anim.hunger = anim.hunger - 0.4f;
         anim.targetEntity = null;
@@ -554,6 +564,7 @@ public abstract class Animal extends Entity{
         {
             hunger = genes.GetHungerCapacity();
         }
+        
         System.out.println("Creature "+ name + " ate entity worth "+ entity.nutrition + " nutrition. Total hunger now: " + hunger);
         entity.KillEntity();
         targetEntity = null;
@@ -606,6 +617,25 @@ public abstract class Animal extends Entity{
 
         g.setColor(Color.BLUE);
         g.drawString(reproduceTimer + " / " +  genes.GetReproduceCooldown(), xOffset, yOffset + 60);
+
+
+        if(parents != null)
+        {
+            for (Animal p : parents) {
+                if(p == null || !p.IsAlive()) continue;
+                g.drawLine(pos.getX(), pos.getY(), p.pos.getX(), p.pos.getY());
+            }
+        }
+
+        g.setColor(Color.PINK);
+        if(children != null)
+        {
+            for (Animal c : children) {
+                if(c == null || !c.IsAlive()) continue;
+                g.drawLine(pos.getX(), pos.getY(), c.pos.getX(), c.pos.getY());
+            }
+        }
+         
 
         
         if(targetEntity != null && targetEntity.IsAlive())
