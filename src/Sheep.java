@@ -1,6 +1,9 @@
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.Comparator;
+
+import javax.imageio.ImageIO;
 
 public class Sheep extends Animal {
 
@@ -62,7 +65,11 @@ public class Sheep extends Animal {
     }
 
     public static Image getSheepImage() {
-        return Toolkit.getDefaultToolkit().getImage("images/sheep.png");
+        try {
+            return ImageIO.read(Sheep.class.getResource("/images/sheep.png"));
+        } catch(IOException | IllegalArgumentException e) {
+            return null;
+        }
     }
 }
 

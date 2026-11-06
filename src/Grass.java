@@ -2,6 +2,10 @@
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 public class Grass extends Plant{
     public Grass()
@@ -39,6 +43,10 @@ public class Grass extends Plant{
     }
 
     public static Image getGrassImage() {
-        return Toolkit.getDefaultToolkit().getImage("images/grass.png");
+        try {
+            return ImageIO.read(Grass.class.getResource("/images/grass.png"));
+        } catch(IOException | IllegalArgumentException e) {
+            return null;
+        }
     }
 }

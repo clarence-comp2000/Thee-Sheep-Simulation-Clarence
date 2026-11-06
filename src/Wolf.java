@@ -1,5 +1,9 @@
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
 import java.util.Comparator;
 
 public class Wolf extends Animal {
@@ -120,6 +124,10 @@ public class Wolf extends Animal {
     }
 
     public static Image getWolfImage() {
-        return Toolkit.getDefaultToolkit().getImage("images/wolf.png");
+        try {
+            return ImageIO.read(Wolf.class.getResource("/images/wolf.png"));
+        } catch(IOException | IllegalArgumentException e) {
+            return null;
+        }
     }
 }

@@ -2,6 +2,9 @@ import java.awt.*;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 public class Flower extends Plant {
     Color fColour;
@@ -23,10 +26,14 @@ public class Flower extends Plant {
     }
 
     public static Image getFlowerImage(Color fColour) {
-        Image ogSprite = Toolkit.getDefaultToolkit().getImage("images/flower.png");
-        Flower temp = new Flower(fColour);
-        ImageFilter filter = temp.new FlowerFilter();
-        return Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(ogSprite.getSource(), filter));
+        try {
+            Image ogSprite = ImageIO.read(Flower.class.getResource("/images/flower.png"));
+            Flower temp = new Flower(fColour);
+            ImageFilter filter = temp.new FlowerFilter();
+            return Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(ogSprite.getSource(), filter));
+        } catch(IOException | IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private class FlowerFilter extends RGBImageFilter {
