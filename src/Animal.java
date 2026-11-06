@@ -591,7 +591,8 @@ public abstract class Animal extends Entity{
             g.fillRect(pos.getX()-20, pos.getY()-20, size,size);
         }
         else {
-            g.drawImage(sprite, pos.getX()-20, pos.getY()-20, size, size, null);
+            int spriteSize = (int)(size * spriteScale);
+            g.drawImage(sprite, pos.getX()-(spriteSize / 2), pos.getY()-(spriteSize / 2), spriteSize, spriteSize, null);
         }
 
         if(!Board.debug && !this.debug) return;

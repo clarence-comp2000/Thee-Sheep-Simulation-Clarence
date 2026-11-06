@@ -17,6 +17,7 @@ public class Wolf extends Animal {
         entityType = Board.Ent.wolf;
 
         sprite = getWolfImage();
+        spriteScale = 1.15f;
         sprintOnFlee = true;
         sprintOnChase = true;
         giveUpChaseOnExhausted = true;
