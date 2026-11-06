@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
@@ -25,6 +26,14 @@ public class Board extends JPanel implements ActionListener {
 
     public StatScreen statScreen;
     public JFrame statFrame;
+
+    private Image sheepSprite;
+    private Image wolfSprite;
+    private Image grassSprite;
+    private Image flowerSprite;
+
+    private boolean started = false;
+
     public Board(int bWidth, int bHeight) {
         Board.bWidth = bWidth;
         Board.bHeight = bHeight;
@@ -36,7 +45,8 @@ public class Board extends JPanel implements ActionListener {
     private void init() {
         addKeyListener(new KeyInput());
         setLayout(null);
-        setBackground(Color.BLACK);
+        Color darkGreen = new Color(0, 210, 0);
+        setBackground(darkGreen);
         setFocusable(true);
         setPreferredSize(new Dimension(bWidth + 100, bHeight + 100));
 
@@ -58,6 +68,11 @@ public class Board extends JPanel implements ActionListener {
         showStats = false;
         statFrame.setVisible(false);
         stats = new ArrayList<>();
+
+        sheepSprite = Sheep.getSheepImage();
+        wolfSprite = Wolf.getWolfImage();
+        grassSprite = Grass.getGrassImage();
+        flowerSprite = Flower.getFlowerImage(new Color(flowerKeyColourR, 0, flowerKeyColourB));
 
         resetSimulation();
 
@@ -186,12 +201,16 @@ public class Board extends JPanel implements ActionListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (!started) {
+            drawStart(g);
+            return;
+        }
         g.setColor(Color.darkGray);
         g.fillRect(bWidth, 0, getWidth(), getHeight());
         g.setColor(Color.gray);
         g.fillRect(0, 0, getWidth(), 100);
-        drawEntities(g);
         drawGrid(g);
+        drawEntities(g);
         drawCounts(g);
         drawKey(g);
         if (showStats) {
@@ -222,7 +241,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawGrid(Graphics g) {
-        g.setColor(Color.white);
+        Color darkerGreen = new Color(0, 170, 0);
+        g.setColor(darkerGreen);
         for (int i = 40; i <= bWidth; i += 40) {
             g.drawLine(i, 100, i, bHeight + 100);
         }
@@ -242,6 +262,7 @@ public class Board extends JPanel implements ActionListener {
     }
 
     Font medium = new Font("Helvetica", Font.PLAIN, 16);
+    Font big = new Font("Helvetica", Font.PLAIN, 20);
     private long timePassed;
     private long lastTime = System.nanoTime();
     private void drawCounts(Graphics g) {
@@ -289,13 +310,15 @@ public class Board extends JPanel implements ActionListener {
         yPos += metrics.getHeight() * 2;
         xPos = getWidth() - (width + metrics.stringWidth("Sheep")) / 2;
         g.drawString("Sheep", xPos, yPos);
-        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(sheepSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Wolf")) / 2;
         g.drawString("Wolf", xPos, yPos);
-        g.setColor(Color.gray);
-        g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(Color.gray);
+        // g.fillRect(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(wolfSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
         g.setColor(Color.white);
         yPos += height;
@@ -304,27 +327,95 @@ public class Board extends JPanel implements ActionListener {
         if (tic % 500 == 0) {
             flowerKeyColourR = (float)Math.random() * 0.75f + 0.25f;
             flowerKeyColourB = (float)Math.random() * 0.75f + 0.25f;
+            Color flowerKeyColour = new Color(flowerKeyColourR, 0, flowerKeyColourB);
+            flowerSprite = Flower.getFlowerImage(flowerKeyColour);
         }
-        g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
-        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+        // g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(flowerSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
 
 
         g.setColor(Color.white);
         yPos += height;
         xPos = getWidth() - (width + metrics.stringWidth("Grass")) / 2;
         g.drawString("Grass", xPos, yPos);
-        g.setColor(Color.green);
-        g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        // g.setColor(Color.green);
+        // g.fillOval(bWidth + (width - 40) / 2, yPos + metrics.getHeight(), 40, 40);
+        g.drawImage(grassSprite, bWidth + (width - 60) / 2, yPos + metrics.getHeight(), 60, 60, null);
     }
 
     private void drawStats(Graphics g) {
         statScreen.drawStats(stats, flowerKeyColourR, flowerKeyColourB);
     }
 
+    private void drawStart(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+        g.setColor(Color.black);
+        g.fillRect(0, 0, width, height);
+        int totalHeight = 230; //Figured out after running code and printing final yPos
+        g.setColor(Color.white);
+        g.setFont(big);
+        FontMetrics metrics = g.getFontMetrics();
+        int strWidth = 0;
+        int strHeight = totalHeight / 2 - metrics.getHeight();
+
+        String str = "Instructions:";
+        strWidth = metrics.stringWidth(str);
+        int xPos = width / 2 - strWidth / 2;
+        int yPos = strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        g.setFont(medium);
+        metrics = g.getFontMetrics();
+        strWidth = 0;
+        strHeight = metrics.getHeight();
+
+        str = "Press \"R\" to reset the simulation";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"Q\" to show the debug view (or simply hover over animals you wish to see)";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"S\" to open the statistics screen, which shows the number of entities";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+        str = "present at a given time";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"I\" to get back to this screen (will pause the simulation)";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+        str = "Press \"Space\" to start";
+        strWidth = metrics.stringWidth(str);
+        xPos = width / 2 - strWidth / 2;
+        yPos += strHeight * 2;
+        g.drawString(str, xPos, yPos);
+
+    }
+
     private int nextSpawn = 50;
     @Override
     // After the timer finishes do this
     public void actionPerformed(ActionEvent e) {
+        if (!started) {
+            repaint();
+            return;
+        }
         if (tic >= nextSpawn) {
             spreadGrass();
             if (entities.get(Ent.grass.get()).size() <= 2) {
@@ -489,6 +580,15 @@ public class Board extends JPanel implements ActionListener {
             if (keyCode == KeyEvent.VK_S) {
                 showStats = !showStats;
                 statFrame.setVisible(showStats);
+            }
+
+            if (keyCode == KeyEvent.VK_SPACE && !started) {
+                started = true;
+                lastTime = System.nanoTime();
+            }
+
+            if (keyCode == KeyEvent.VK_I && started) {
+                started = false;
             }
         }
     }

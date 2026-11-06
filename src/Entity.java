@@ -2,6 +2,8 @@ import java.awt.*;
 public abstract class Entity {
     public Position pos;
     protected Board.Ent entityType;
+    protected Image sprite;
+    protected float spriteScale = 1;
 
     public Board.Ent GetType()
     {

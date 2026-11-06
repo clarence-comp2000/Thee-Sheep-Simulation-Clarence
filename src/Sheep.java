@@ -9,7 +9,7 @@ public class Sheep extends Animal {
         super(genes, parents, age);
         nutrition = 0.5;
         entityType = Board.Ent.sheep;
-
+        this.sprite = getSheepImage();
         sprintOnFlee = true;
     }
 
@@ -59,6 +59,10 @@ public class Sheep extends Animal {
         Board.babyAnimals.add(newSheep);
 
         super.Reproduce(partAnimal);
+    }
+
+    public static Image getSheepImage() {
+        return Toolkit.getDefaultToolkit().getImage("images/sheep.png");
     }
 }
 

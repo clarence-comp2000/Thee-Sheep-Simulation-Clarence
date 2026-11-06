@@ -47,6 +47,7 @@ public class StatScreen extends JPanel{
         drawLines(g);
 
         drawAxes(g);
+        drawKey(g);
     }
 
     private void drawDots(Graphics g) {
@@ -139,6 +140,57 @@ public class StatScreen extends JPanel{
         strWidth = metrics.stringWidth(str);
         g.drawString(str, -(height - yOffset) / 2 - strWidth, metrics.getHeight());
         g2d.rotate(Math.toRadians(-angle));
+    }
+    Font medium = new Font("Helvetica", Font.PLAIN, 16);
+    Font small = new Font("Helvetica", Font.PLAIN, 13);
+    private void drawKey(Graphics g) {
+        g.setColor(Color.white);
+        g.setFont(medium);
+        String str = "Key:";
+        FontMetrics metrics = g.getFontMetrics();
+        int strWidth = metrics.stringWidth(str);
+        int strHeight = metrics.getHeight() / 2;
+        int xPos = width - (strWidth + Math.max(90 - strWidth, 0));
+        int yPos = strHeight + 25;
+        g.drawString(str, xPos, yPos);
+
+        g.setFont(small);
+        metrics = g.getFontMetrics();
+        strHeight = metrics.getHeight() / 2;
+
+        str = " Sheep";
+        strWidth = metrics.stringWidth(str);
+        xPos = width - (strWidth + Math.max(80 - strWidth, 0));
+        yPos += strHeight + 15;
+        g.drawString(str, xPos, yPos);
+        g.drawLine(xPos - 20, yPos - strHeight / 2, xPos - 5, yPos - strHeight / 2);
+
+        str = " Wolf";
+        strWidth = metrics.stringWidth(str);
+        xPos = width - (strWidth + Math.max(80 - strWidth, 0));
+        yPos += strHeight + 15;
+        g.drawString(str, xPos, yPos);
+        g.setColor(Color.gray);
+        g.drawLine(xPos - 20, yPos - strHeight / 2, xPos - 5, yPos - strHeight / 2);
+
+        g.setColor(Color.white);
+        str = " Flower";
+        strWidth = metrics.stringWidth(str);
+        xPos = width - (strWidth + Math.max(80 - strWidth, 0));
+        yPos += strHeight + 15;
+        g.drawString(str, xPos, yPos);
+        g.setColor(new Color(flowerColourR, 0, flowerColourB));
+        g.drawLine(xPos - 20, yPos - strHeight / 2, xPos - 5, yPos - strHeight / 2);
+
+        g.setColor(Color.white);
+        str = " Grass";
+        strWidth = metrics.stringWidth(str);
+        xPos = width - (strWidth + Math.max(80 - strWidth, 0));
+        yPos += strHeight + 15;
+        g.drawString(str, xPos, yPos);
+        g.setColor(Color.green);
+        g.drawLine(xPos - 20, yPos - strHeight / 2, xPos - 5, yPos - strHeight / 2);
+
     }
 
     private int scaleXPos(int xPos) {
