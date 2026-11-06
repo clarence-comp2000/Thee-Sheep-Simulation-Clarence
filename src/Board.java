@@ -203,8 +203,8 @@ public class Board extends JPanel implements ActionListener {
         g.fillRect(bWidth, 0, getWidth(), getHeight());
         g.setColor(Color.gray);
         g.fillRect(0, 0, getWidth(), 100);
-        drawEntities(g);
         drawGrid(g);
+        drawEntities(g);
         drawCounts(g);
         drawKey(g);
         if (showStats) {
@@ -235,7 +235,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawGrid(Graphics g) {
-        g.setColor(Color.white);
+        Color darkerGreen = new Color(0, 170, 0);
+        g.setColor(darkerGreen);
         for (int i = 40; i <= bWidth; i += 40) {
             g.drawLine(i, 100, i, bHeight + 100);
         }
