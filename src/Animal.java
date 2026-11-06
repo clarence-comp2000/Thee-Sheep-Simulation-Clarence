@@ -228,7 +228,7 @@ public abstract class Animal extends Entity{
 
     protected void UpdateStats()
     {
-         if(reproduceTimer >= 0)
+         if(reproduceTimer > 0)
         {
             reproduceTimer--;
         }
