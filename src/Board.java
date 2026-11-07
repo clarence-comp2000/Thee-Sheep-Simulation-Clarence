@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 import javax.swing.*;
 
@@ -31,6 +34,7 @@ public class Board extends JPanel implements ActionListener {
     private Image wolfSprite;
     private Image grassSprite;
     private Image flowerSprite;
+    private BufferedImage backgroundPNG;
 
     private boolean started = false;
 
@@ -73,6 +77,14 @@ public class Board extends JPanel implements ActionListener {
         wolfSprite = Wolf.getWolfImage();
         grassSprite = Grass.getGrassImage();
         flowerSprite = Flower.getFlowerImage(new Color(flowerKeyColourR, 0, flowerKeyColourB));
+
+        try {
+            backgroundPNG = ImageIO.read(
+                Board.class.getResource("/images/background.png")
+            );
+        } catch (IOException | IllegalArgumentException e) {
+            e.printStackTrace();
+        }
 
         resetSimulation();
 
@@ -205,6 +217,10 @@ public class Board extends JPanel implements ActionListener {
             drawStart(g);
             return;
         }
+        if (backgroundPNG != null) {
+            g.drawImage(backgroundPNG, 0, 100, bWidth, getHeight() - 100, this);
+        }
+
         g.setColor(Color.darkGray);
         g.fillRect(bWidth, 0, getWidth(), getHeight());
         g.setColor(Color.gray);
@@ -241,8 +257,8 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void drawGrid(Graphics g) {
-        Color darkerGreen = new Color(0, 170, 0);
-        g.setColor(darkerGreen);
+        //Color darkerGreen = new Color(0, 170, 0);
+        g.setColor(Color.darkGray);
         for (int i = 40; i <= bWidth; i += 40) {
             g.drawLine(i, 100, i, bHeight + 100);
         }
