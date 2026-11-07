@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public abstract class Animal extends Entity{
 
+protected boolean spriteFaceRight = true;
+protected boolean facingRight = true;
+
     protected enum AnimalState
     {
         lookingForFood,
@@ -171,10 +174,22 @@ public abstract class Animal extends Entity{
             }
         }
 
-        if(Math.abs(direction.getX()) > Math.abs(direction.getY()))
-        {
-            pos.setX((int)(pos.getX() + moveSpeed * Math.signum(direction.getX())));
-        }else{
+        // if(Math.abs(direction.getX()) > Math.abs(direction.getY()))
+        // {
+        //     pos.setX((int)(pos.getX() + moveSpeed * Math.signum(direction.getX())));
+        // }else{
+        //     pos.setY((int)(pos.getY() + moveSpeed * Math.signum(direction.getY())));
+        // }
+        if (Math.abs(direction.getX()) > Math.abs(direction.getY())) {
+            int oldX = pos.getX();
+            int newX = (int)(oldX + moveSpeed * Math.signum(direction.getX()));
+
+            if (newX != oldX) {
+                facingRight = newX > oldX;
+            }
+
+            pos.setX(newX);
+        } else {
             pos.setY((int)(pos.getY() + moveSpeed * Math.signum(direction.getY())));
         }
         return false;
@@ -590,10 +605,22 @@ public abstract class Animal extends Entity{
         if (sprite == null) {
             g.fillRect(pos.getX()-20, pos.getY()-20, size,size);
         }
+        // else {
+        //     int spriteSize = (int)(size * spriteScale);
+        //     g.drawImage(sprite, pos.getX()-(spriteSize / 2), pos.getY()-(spriteSize / 2), spriteSize, spriteSize, null);
+        // }
         else {
             int spriteSize = (int)(size * spriteScale);
-            g.drawImage(sprite, pos.getX()-(spriteSize / 2), pos.getY()-(spriteSize / 2), spriteSize, spriteSize, null);
+            int x = pos.getX() - spriteSize / 2;
+            int y = pos.getY() - spriteSize / 2;
+
+            if (facingRight == spriteFaceRight) {
+                g.drawImage(sprite, x, y, spriteSize, spriteSize, null);
+            } else {
+                g.drawImage(sprite, x + spriteSize, y, -spriteSize, spriteSize, null);
+            }
         }
+
 
         if(!Board.debug && !this.debug) return;
         g.drawOval(pos.getX() - (int)genes.GetPerception()/2, pos.getY() - (int)genes.GetPerception()/2, (int)genes.GetPerception(), (int)genes.GetPerception());
