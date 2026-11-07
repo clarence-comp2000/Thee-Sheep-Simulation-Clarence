@@ -258,7 +258,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void drawGrid(Graphics g) {
         //Color darkerGreen = new Color(0, 170, 0);
-        g.setColor(Color.darkGray);
+        g.setColor(Color.white);
         for (int i = 40; i <= bWidth; i += 40) {
             g.drawLine(i, 100, i, bHeight + 100);
         }

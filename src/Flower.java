@@ -20,6 +20,7 @@ public class Flower extends Plant {
         this.pColour = fColour;
         entityType = Board.Ent.flower;
         this.sprite = getFlowerImage(fColour);
+        this.spriteScale = 1.5f;
     }
     public Flower (Color pColour) {
         this.pColour = pColour;
